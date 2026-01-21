@@ -1,0 +1,2900 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/qwrt5589/BHJB/31bd4272e665a4a5e77e875edbba39b65de1901b/%E5%B0%A8ui.txt"))()
+
+local rainbowBorderAnimation
+local currentBorderColorScheme = "彩虹颜色"
+local animationSpeed = 2
+local borderEnabled = true
+local borderInitialized = false
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(0.16, Color3.fromHex("FFA500")),ColorSequenceKeypoint.new(0.33, Color3.fromHex("FFFF00")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00FF00")),ColorSequenceKeypoint.new(0.66, Color3.fromHex("0000FF")),ColorSequenceKeypoint.new(0.83, Color3.fromHex("4B0082")),ColorSequenceKeypoint.new(1, Color3.fromHex("EE82EE"))}),"palette"},
+    ["黑红颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(1, Color3.fromHex("000000"))}),"alert-triangle"},
+    ["蓝白颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FFFFFF")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("1E90FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFFFFF"))}),"droplet"},
+    ["紫金颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FFD700")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("8A2BE2")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFD700"))}),"crown"},
+    ["蓝黑颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("0000FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("000000"))}),"moon"},
+    ["绿紫颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("00FF00")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("800080")),ColorSequenceKeypoint.new(1, Color3.fromHex("00FF00"))}),"zap"},
+    ["粉蓝颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF69B4")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00BFFF")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF69B4"))}),"heart"},
+    ["橙青颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00CED1")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF4500"))}),"sun"},
+    ["红金颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FFD700")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF0000"))}),"award"},
+    ["银蓝颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("C0C0C0")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("4682B4")),ColorSequenceKeypoint.new(1, Color3.fromHex("C0C0C0"))}),"star"},
+    ["霓虹颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF00FF")),ColorSequenceKeypoint.new(0.25, Color3.fromHex("00FFFF")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FFFF00")),ColorSequenceKeypoint.new(0.75, Color3.fromHex("FF00FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("00FFFF"))}),"sparkles"},
+    ["森林颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("228B22")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("32CD32")),ColorSequenceKeypoint.new(1, Color3.fromHex("228B22"))}),"tree"},
+    ["火焰颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF8C00"))}),"flame"},
+    ["海洋颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000080")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("1E90FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("00BFFF"))}),"waves"},
+    ["日落颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF8C00")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFD700"))}),"sunset"},
+    ["银河颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("4B0082")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("8A2BE2")),ColorSequenceKeypoint.new(1, Color3.fromHex("9370DB"))}),"galaxy"},
+    ["糖果颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF69B4")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF1493")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFB6C1"))}),"candy"},
+    ["金属颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("C0C0C0")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("A9A9A9")),ColorSequenceKeypoint.new(1, Color3.fromHex("696969"))}),"shield"}
+}
+
+local function createRainbowBorder(window, colorScheme, speed)
+    if not window or not window.UIElements then
+        wait(1)
+        if not window or not window.UIElements then
+            return nil, nil
+        end
+    end
+    
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then
+        return nil, nil
+    end
+    
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then
+        local glowEffect = existingStroke:FindFirstChild("GlowEffect")
+        if glowEffect then
+            local schemeData = COLOR_SCHEMES[colorScheme or currentBorderColorScheme]
+            if schemeData then
+                glowEffect.Color = schemeData[1]
+            end
+        end
+        return existingStroke, rainbowBorderAnimation
+    end
+    
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+    
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 1.5
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Enabled = borderEnabled
+    rainbowStroke.Parent = mainFrame
+    
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    
+    local schemeData = COLOR_SCHEMES[colorScheme or currentBorderColorScheme]
+    if schemeData then
+        glowEffect.Color = schemeData[1]
+    else
+        glowEffect.Color = COLOR_SCHEMES["彩虹颜色"][1]
+    end
+    
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+    
+    return rainbowStroke, nil
+end
+
+local function startBorderAnimation(window, speed)
+    if not window or not window.UIElements then
+        return nil
+    end
+    
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then
+        return nil
+    end
+    
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke or not rainbowStroke.Enabled then
+        return nil
+    end
+    
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then
+        return nil
+    end
+    
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+    
+    local animation
+    animation = game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil or not rainbowStroke.Enabled then
+            animation:Disconnect()
+            return
+        end
+        
+        local time = tick()
+        glowEffect.Rotation = (time * speed * 60) % 360
+    end)
+    
+    rainbowBorderAnimation = animation
+    return animation
+end
+
+local function initializeRainbowBorder(scheme, speed)
+    speed = speed or animationSpeed
+    
+    local rainbowStroke, _ = createRainbowBorder(Window, scheme, speed)
+    if rainbowStroke then
+        if borderEnabled then
+            startBorderAnimation(Window, speed)
+        end
+        borderInitialized = true
+        return true
+    end
+    return false
+end
+
+local function playSound()
+    pcall(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://9047002353"
+        sound.Volume = 0.3
+        sound.Parent = game:GetService("SoundService")
+        sound:Play()
+        game:GetService("Debris"):AddItem(sound, 2)
+    end)
+end
+
+local Window = WindUI:CreateWindow({
+    Title = "<font color='#FFA500'>尨脚本</font><font color='#FF8C00'>尨淑</font>",
+    Icon = "rbxassetid://83943559238385",
+    IconTransparency = 0.5,
+    IconThemed = true,
+    Author = "作者:尨淑",
+    Folder = "尨",
+    Size = UDim2.fromOffset(580, 200),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() print("用户信息") end,
+        Anonymous = false
+    },
+    Background = "rbxassetid://77755327634148"
+})
+
+
+spawn(function()
+    wait(0.5)
+    initializeRainbowBorder("彩虹颜色", animationSpeed)
+end)
+
+Window:Tag({
+    Title = "QQ;1693323219",
+    Color = Color3.fromHex("#FFA500")
+})
+
+Window:Tag({
+    Title = "尨脚本",
+    Color = Color3.fromHex("#FF5F00")
+})
+
+local TimeTag = Window:Tag({
+    Title = "作者尨舒",
+    Color = Color3.fromHex("#FF8C00")
+})
+
+WindUI:Notify({
+    Title = "<font color='#FF5F00'>最强的脚本</font>",
+    Content = "<font color='#4ECDC4'>打压一切脚本</font>",
+    Duration = 10,
+    Icon = "bird",
+})
+
+
+local SettingsTab = Window:Tab({
+    Title = "边框设置",
+    Icon = "palette",
+    Locked = false,
+})
+
+SettingsTab:Toggle({
+    Title = "启用边框",
+    Desc = "开关霓虹灯边框效果",
+    Default = borderEnabled,
+    Callback = function(value)
+        borderEnabled = value
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+            if rainbowStroke then
+                rainbowStroke.Enabled = value
+                if value and not rainbowBorderAnimation then
+                    startBorderAnimation(Window, animationSpeed)
+                elseif not value and rainbowBorderAnimation then
+                    rainbowBorderAnimation:Disconnect()
+                    rainbowBorderAnimation = nil
+                end
+                
+                WindUI:Notify({
+                    Title = "边框",
+                    Content = value and "已启用" or "已禁用",
+                    Duration = 2,
+                    Icon = value and "eye" or "eye-off"
+                })
+            end
+        end
+    end
+})
+
+local colorSchemeNames = {}
+for name, _ in pairs(COLOR_SCHEMES) do
+    table.insert(colorSchemeNames, name)
+end
+table.sort(colorSchemeNames)
+
+SettingsTab:Dropdown({
+    Title = "边框颜色",
+    Desc = "选择喜欢的颜色组合",
+    Values = colorSchemeNames,
+    Value = "彩虹颜色",
+    Callback = function(value)
+        currentBorderColorScheme = value
+        local success = initializeRainbowBorder(value, animationSpeed)
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "边框转动速度",
+    Desc = "调整边框旋转的快慢",
+    Value = { 
+        Min = 1,
+        Max = 10,
+        Default = 5,
+    },
+    Callback = function(value)
+        animationSpeed = value
+        if rainbowBorderAnimation then
+            rainbowBorderAnimation:Disconnect()
+            rainbowBorderAnimation = nil
+        end
+        if borderEnabled then
+            startBorderAnimation(Window, animationSpeed)
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "边框粗细",
+    Desc = "调整边框的粗细",
+    Value = { 
+        Min = 1,
+        Max = 5,
+        Default = 1.5,
+    },
+    Step = 0.5,
+    Callback = function(value)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+            if rainbowStroke then
+                rainbowStroke.Thickness = value
+            end
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "圆角大小",
+    Desc = "调整UI圆角的大小",
+    Value = { 
+        Min = 0,
+        Max = 20,
+        Default = 16,
+    },
+    Callback = function(value)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local corner = mainFrame:FindFirstChildOfClass("UICorner")
+            if not corner then
+                corner = Instance.new("UICorner")
+                corner.Parent = mainFrame
+            end
+            corner.CornerRadius = UDim.new(0, value)
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Button({
+    Title = "随机颜色",
+    Icon = "palette",
+    Callback = function()
+        local randomColor = colorSchemeNames[math.random(1, #colorSchemeNames)]
+        currentBorderColorScheme = randomColor
+        initializeRainbowBorder(randomColor, animationSpeed)
+        playSound()
+    end
+})
+
+
+Window:OnClose(function()
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+end)
+
+Window:OnDestroy(function()
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+end)
+
+local Tab = Window:Tab({
+    Title = "公告",
+    Icon = "layout-grid",
+    Locked = false,
+})
+
+local Paragraph = Tab:Paragraph({
+    Title = "欢迎使用",
+    Desc = "QQ 1693323219",
+    Image = "rbxassetid://130024611892024",
+    ImageSize = 42,
+    Thumbnail = "rbxassetid://72099292964852",
+    ThumbnailSize = 120,
+})
+
+local Paragraph = Tab:Paragraph({
+    Title = "欢迎使用",
+    Desc = "QQ 1693323219",    
+    Thumbnail = "rbxassetid://72368339506794",
+    ThumbnailSize = 0,
+})
+
+local Tabs = {
+    Main = Window:Section({ Title = "脚本", Opened = true }),
+    Settings = Window:Section({ Title = "作者:尨舒", Opened = true }),
+    Utilities = Window:Section({ Title = "QQ1693323219", Opened = true })
+}
+
+local Tab = Tabs.Main:Tab({
+    Title = "砍伐树木",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "树木隐形",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        invisibleLoop = not invisibleLoop
+        visibleLoop = false
+        task.spawn(function()
+            while invisibleLoop do
+                applyInvisible(model)
+                task.wait(2)
+            end
+        end)
+    end
+})
+
+local Button = Tab:Button({
+    Title = "树木显形",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        visibleLoop = not visibleLoop
+        invisibleLoop = false
+        task.spawn(function()
+            while visibleLoop do
+                applyVisible(model)
+                task.wait(2)
+            end
+        end)
+    end
+})
+
+local Button = Tab:Button({
+    Title = "巨大工具",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local tool = char:FindFirstChildWhichIsA("Tool")
+        if not tool then return end
+        local handle = tool:FindFirstChild("Handle")
+        if handle then
+            handle.Size = Vector3.new(1000,1000,1000)
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "速度+75",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        if char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = 75
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "无卡顿 (FPS提升)",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        noLag = not noLag
+        setNoLag(noLag)
+    end
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "脑红跳跃",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "刷取金钱",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local spamming = true
+        
+        task.spawn(function()
+            while spamming do
+                pcall(function()
+                    local args = {
+                        {
+                            value = 9e300,
+                            type = "Money",
+                            chance = 0.45
+                        }
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Roulette"):WaitForChild("GiveOutReward"):FireServer(unpack(args))
+                end)
+                task.wait(0.001)
+            end
+        end)
+        
+        task.wait(5)
+        spamming = false
+    end
+})
+
+local Button = Tab:Button({
+    Title = "刷取重生",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local spamming = true
+        
+        task.spawn(function()
+            while spamming do
+                pcall(function()
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Rebirth"):FireServer()
+                end)
+                task.wait(0.001)
+            end
+        end)
+        
+        task.wait(5)
+        spamming = false
+    end
+})
+
+local Button = Tab:Button({
+    Title = "刷取金币",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local spamming = true
+        
+        task.spawn(function()
+            local r = game:GetService("ReplicatedStorage").Events.Reward
+            while spamming do
+                if r:IsA("RemoteEvent") then
+                    r:FireServer()
+                    task.wait(0.1)
+                    r:FireServer(1)
+                    task.wait(0.1)
+                    r:FireServer("reward")
+                end
+                task.wait(0.05)
+            end
+        end)
+        
+        task.wait(5)
+        spamming = false
+    end
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "喔瘪模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "自动大便",
+    Desc = "开启后每3秒自动大便",
+    Locked = false,
+    Callback = function()
+        pr = not pr
+        if pr then
+            li:Notify({Title = "自动大便", Description = "已启用", Time = 3})
+            t2 = task.spawn(function()
+                while pr do
+                    rm:FireServer(buffer.create(20))
+                    task.wait(3)
+                end
+            end)
+        else
+            li:Notify({Title = "自动大便", Description = "已禁用", Time = 3})
+            if t2 then
+                task.cancel(t2)
+                t2 = nil
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "滑块全满变红",
+    Desc = "使滑块变为全满且红色",
+    Locked = false,
+    Callback = function()
+        local py = game:GetService("Players")
+        local lp = py.LocalPlayer
+        local gu = lp.PlayerGui:WaitForChild("PoopUI")
+        local cb = gu:WaitForChild("CatchBar")
+        local bl = cb:WaitForChild("BarLine")
+        local sl = bl:WaitForChild("Slider")
+        local tr = sl:WaitForChild("Target")
+
+        sl.Size = UDim2.new(1, 0, sl.Size.Y.Scale, 0)
+        sl.Position = UDim2.new(0, 0, sl.Position.Y.Scale, 0)
+        sl.AnchorPoint = Vector2.new(0, 0)
+        sl.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        
+        if tr then
+            tr.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        end
+
+        sl:GetPropertyChangedSignal("Position"):Connect(function()
+            sl.Position = UDim2.new(0, 0, sl.Position.Y.Scale, 0)
+        end)
+        sl:GetPropertyChangedSignal("Size"):Connect(function()
+            sl.Size = UDim2.new(1, 0, sl.Size.Y.Scale, 0)
+        end)
+        if tr then
+            tr:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
+                tr.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            end)
+        end
+        
+        li:Notify({Title = "成功", Description = "滑块已修改", Time = 3})
+    end
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "出租车老板",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Toggle = Tab:Toggle({
+    Title = "自动金钱",
+    Desc = "自动完成材料合同",
+    Default = false,
+    Callback = function(state)
+        GlobalVars.test2 = state
+        if state then
+            task.spawn(function()
+                pcall(function()
+                    local activeQuests = Players.LocalPlayer:FindFirstChild("ActiveQuests")
+                    if activeQuests then
+                        local quest = activeQuests:FindFirstChildOfClass("StringValue")
+                        if quest then
+                            ReplicatedStorage.Quests.Contracts.CancelContract:InvokeServer(quest.Name)
+                        end
+                    end
+                end)
+                
+                while GlobalVars.test2 do
+                    task.wait(0.5)
+                    pcall(function()
+                        local activeQuests = Players.LocalPlayer:FindFirstChild("ActiveQuests")
+                        if activeQuests then
+                            if not activeQuests:FindFirstChild("contractBuildMaterial") then
+                                ReplicatedStorage.Quests.Contracts.StartContract:InvokeServer("contractBuildMaterial")
+                                repeat task.wait(0.1) until activeQuests:FindFirstChild("contractBuildMaterial")
+                            end
+                            
+                            local contract = activeQuests:FindFirstChild("contractBuildMaterial")
+                            if contract then
+                                repeat
+                                    task.wait(0.1)
+                                    ReplicatedStorage.Quests.DeliveryComplete:InvokeServer("contractMaterial")
+                                until contract.Value == "!pw5pi3ps2" or not GlobalVars.test2
+                                
+                                if GlobalVars.test2 then
+                                    ReplicatedStorage.Quests.Contracts.CompleteContract:InvokeServer()
+                                end
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "自动收集雪堆",
+    Desc = "自动收集雪堆获取奖励",
+    Default = false,
+    Callback = function(state)
+        GlobalVars.teleportSnow = state
+        if state then
+            task.spawn(function()
+                while GlobalVars.teleportSnow do
+                    task.wait(0.5)
+                    pcall(function()
+                        local SpawnedSnowPiles = Workspace:WaitForChild("SpawnedSnowPiles", 5)
+                        if not SpawnedSnowPiles then return end
+                        
+                        if not LocalPlayer or not LocalPlayer.Character then return end
+
+                        local primaryPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart") or LocalPlayer.Character:FindFirstChild("Head")
+                        if not primaryPart then return end
+
+                        for i, snowPile in pairs(SpawnedSnowPiles:GetChildren()) do
+                            if snowPile:IsA("BasePart") then
+                                snowPile.Transparency = 1
+                                snowPile.CFrame = CFrame.new(primaryPart.Position)
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "自动摧毁南瓜",
+    Desc = "自动摧毁南瓜获取糖果",
+    Default = false,
+    Callback = function(state)
+        GlobalVars.candy = state
+        if state then
+            task.spawn(function()
+                while GlobalVars.candy do
+                    task.wait(0.5)
+                    pcall(function()
+                        local car = findCar()
+                        if car and car.PrimaryPart then
+                            local pumpkins = Workspace:FindFirstChild("Pumpkins")
+                            if pumpkins then
+                                for i, v in pairs(pumpkins:GetDescendants()) do
+                                    if v.Name == "TouchInterest" and v.Parent then
+                                        firetouchinterest(car.PrimaryPart, v.Parent, 0)
+                                        firetouchinterest(car.PrimaryPart, v.Parent, 1)
+                                        task.wait(0.1)
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "自动收集零件",
+    Desc = "自动传送并收集车辆零件",
+    Default = false,
+    Callback = function(state)
+        GlobalVars.partcollector = state
+        if state then
+            task.spawn(function()
+                while GlobalVars.partcollector do
+                    task.wait(0.5)
+                    pcall(function()
+                        local locations = Workspace:FindFirstChild("ItemSpawnLocations")
+                        if locations and Players.LocalPlayer.Character then
+                            local character = Players.LocalPlayer.Character
+                            for a, b in pairs(locations:GetChildren()) do
+                                if GlobalVars.partcollector then
+                                    character:PivotTo(b.CFrame + Vector3.new(0, 251, 0))
+                                    task.wait(0.5)
+                                    
+                                    for i, v in pairs(locations:GetDescendants()) do
+                                        if v.Name == "TouchInterest" and v.Parent and character:FindFirstChild("HumanoidRootPart") then
+                                            firetouchinterest(character.HumanoidRootPart, v.Parent, 0)
+                                            firetouchinterest(character.HumanoidRootPart, v.Parent, 1)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+local Toggle = Tab:Toggle({
+    Title = "自动升级办公室",
+    Desc = "自动将办公室升级到16级",
+    Default = false,
+    Callback = function(state)
+        GlobalVars.ofs = state
+        if state then
+            task.spawn(function()
+                while GlobalVars.ofs do
+                    task.wait(0.5)
+                    pcall(function()
+                        if not Players.LocalPlayer:FindFirstChild("Office") then
+                            ReplicatedStorage.Company.StartOffice:InvokeServer()
+                            task.wait(0.2)
+                        end
+                        
+                        local office = Players.LocalPlayer:FindFirstChild("Office")
+                        if office and office:GetAttribute("level") and office:GetAttribute("level") < 16 then
+                            ReplicatedStorage.Company.SkipOfficeQuest:InvokeServer()
+                            ReplicatedStorage.Company.UpgradeOffice:InvokeServer()
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "俄亥俄州",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Button = Tab:Button({
+    Title = "全部气球",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local function getAllBalloons()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+            
+            pcall(function()
+                local itemSystem = require(ReplicatedStorage.devv).load("v3item")
+                local inventory = itemSystem.inventory
+                
+                local fistsItem = nil
+                for guid, item in pairs(inventory.items) do
+                    if item.name == "Fists" then
+                        fistsItem = item
+                        break
+                    end
+                end
+                
+                local hdir = ReplicatedStorage.devv.shared.Indicies.v3items.bin.Holdable
+                if hdir then
+                    for _, hmd in pairs(hdir:GetChildren()) do
+                        if hmd:IsA("ModuleScript") then
+                            pcall(function()
+                                local hdat = require(hmd)
+                                if hdat and hdat.name and hdat.holdableType == "Balloon" then
+                                    local hnew = {
+                                        name = hdat.name,
+                                        guid = hdat.name:gsub("%s", "_"):lower() .. "_" .. tostring(tick()),
+                                        modelName = hdat.modelName or hdat.name,
+                                        holdableType = "Balloon",
+                                        multiplier = hdat.multiplier or 0.5,
+                                        movespeedAdd = hdat.movespeedAdd or 0,
+                                        canDrop = false,
+                                        cannotDiscard = true,
+                                        permanent = true,
+                                        unpurchasable = true,
+                                        TPSOffsets = hdat.TPSOffsets or {},
+                                        viewportOffsets = hdat.viewportOffsets or (fistsItem and fistsItem.viewportOffsets)
+                                    }
+                                    if inventory.add then
+                                        inventory.add(hnew, false)
+                                        if inventory.currentItemsData then
+                                            table.insert(inventory.currentItemsData, hnew)
+                                        end
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+                
+                if fistsItem then
+                    local fistsCopy = {
+                        name = "Fists",
+                        guid = "fists_copy_" .. tostring(tick()),
+                        permanent = true,
+                        cannotDiscard = true,
+                        doMakeModel = false,
+                        debounce = 0.3,
+                        damageTable = {
+                            meleepunch = 15,
+                            meleemegapunch = 200,
+                            meleekick = 20,
+                            meleejumpKick = 20
+                        },
+                        viewportOffsets = fistsItem.viewportOffsets,
+                        TPSOffsets = fistsItem.TPSOffsets or {},
+                        FPSOffsets = fistsItem.FPSOffsets or {}
+                    }
+                    if inventory.add then
+                        inventory.add(fistsCopy, false)
+                    end
+                end
+                
+                if inventory.rerender then
+                    inventory:rerender()
+                end
+            end)
+        end
+        
+        getAllBalloons()
+    end
+})
+
+local Button = Tab:Button({
+    Title = "美金球",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local function getDollarBalloon()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+            
+            pcall(function()
+                local itemSystem = require(ReplicatedStorage.devv).load("v3item")
+                local inventory = itemSystem.inventory
+                
+                local fistsItem = nil
+                for guid, item in pairs(inventory.items) do
+                    if item.name == "Fists" then
+                        fistsItem = item
+                        break
+                    end
+                end
+                
+                local dollarBalloonData = {
+                    name = "Dollar Balloon",
+                    guid = "dollar_balloon_" .. tostring(tick()),
+                    modelName = "Dollar Balloon",
+                    holdableType = "Balloon",
+                    multiplier = 0.8,
+                    movespeedAdd = 8,
+                    canDrop = false,
+                    cannotDiscard = true,
+                    permanent = true,
+                    unpurchasable = true,
+                    TPSOffsets = {
+                        hold = CFrame.new(0, 0, 0) * CFrame.Angles(0, math.pi, 0)
+                    },
+                    viewportOffsets = {
+                        hotbar = {
+                            dist = 4,
+                            offset = CFrame.new(0, 0, 0),
+                            rotoffset = CFrame.Angles(0, 0, 0)
+                        },
+                        ammoHUD = {
+                            dist = 5,
+                            offset = CFrame.new(0, 0, 0),
+                            rotoffset = CFrame.Angles(0, 0, 0)
+                        }
+                    }
+                }
+                
+                if inventory.add then
+                    inventory.add(dollarBalloonData, false)
+                    if inventory.currentItemsData then
+                        table.insert(inventory.currentItemsData, dollarBalloonData)
+                    end
+                end
+                
+                if fistsItem then
+                    local fistsCopy = {
+                        name = "Fists",
+                        guid = "fists_copy_" .. tostring(tick()),
+                        permanent = true,
+                        cannotDiscard = true,
+                        doMakeModel = false,
+                        debounce = 0.3,
+                        damageTable = {
+                            meleepunch = 15,
+                            meleemegapunch = 200,
+                            meleekick = 20,
+                            meleejumpKick = 20
+                        },
+                        viewportOffsets = fistsItem.viewportOffsets,
+                        TPSOffsets = fistsItem.TPSOffsets or {},
+                        FPSOffsets = fistsItem.FPSOffsets or {}
+                    }
+                    if inventory.add then
+                        inventory.add(fistsCopy, false)
+                    end
+                end
+                
+                if inventory.rerender then
+                    inventory:rerender()
+                end
+            end)
+        end
+        
+        getDollarBalloon()
+    end
+})
+
+local Button = Tab:Button({
+    Title = "自动拾取气球和打印器",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local autob = true
+        while autob and wait() do 
+            local Players = game:GetService("Players")
+            local localPlayer = Players.LocalPlayer
+            local rootPart = localPlayer.Character.HumanoidRootPart
+
+            for _, l in pairs(game.Workspace.Game.Entities.ItemPickup:GetChildren()) do
+                for _, v in pairs(l:GetChildren()) do
+                    if v:IsA("MeshPart") or v:IsA("Part") then
+                        local e = v:FindFirstChildOfClass("ProximityPrompt")
+                        if e and (e.ObjectText == "Bat Balloon" or e.ObjectText == "Gold Clover Balloon" or e.ObjectText == "Golden Rose" or e.ObjectText == "Black Rose" or e.ObjectText == "Heart Balloon" or e.ObjectText == "Skull Balloon" or e.ObjectText == "Money Printer") then
+                            rootPart.CFrame = v.CFrame * CFrame.new(0, 2, 0)
+                            e.RequiresLineOfSight = false
+                            e.HoldDuration = 0
+                            fireproximityprompt(e)
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "自动拾取宝石",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local autobs = true
+        while autobs and wait() do 
+            local Players = game:GetService("Players")
+            local localPlayer = Players.LocalPlayer
+            local rootPart = localPlayer.Character.HumanoidRootPart
+
+            for _, l in pairs(game.Workspace.Game.Entities.ItemPickup:GetChildren()) do
+                for _, v in pairs(l:GetChildren()) do
+                    if v:IsA("MeshPart") or v:IsA("Part") then
+                        local e = v:FindFirstChildOfClass("ProximityPrompt")
+                        if e and (e.ObjectText == "Amethyst" or e.ObjectText == "Sapphire" or e.ObjectText == "Emerald"  or e.ObjectText == "Topaz"  or e.ObjectText == "Ruby"  or e.ObjectText == "Diamond Ring"  or e.ObjectText == "Diamond" or e.ObjectText == "Void Gem" or e.ObjectText == "Dark Matter Gem" or e.ObjectText == "Rollie" or e.ObjectText == "Gold Bar") then
+                            rootPart.CFrame = v.CFrame * CFrame.new(0, 2, 0)
+                            e.RequiresLineOfSight = false
+                            e.HoldDuration = 0
+                            fireproximityprompt(e)
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "自动开启保险",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local bxbx = true
+        while bxbx and wait() do
+            local epoh2 = game:GetService("Players")
+            local epoh3 = epoh2.LocalPlayer.Character.HumanoidRootPart
+            local Players = game:GetService("Players")
+            local localPlayer = Players.LocalPlayer
+            if localPlayer.Character then
+                local rootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    for _, obj in ipairs(workspace.Game.Entities.GoldJewelSafe:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt") and (obj.ActionText == "Crack Chest" or obj.ActionText == "Crack Safe") and obj.Enabled then
+                            if bxbx then
+                                obj.RequiresLineOfSight = false
+                                obj.HoldDuration = 0
+                                local target = obj.Parent and obj.Parent.Parent
+                                if target and target:IsA("BasePart") then
+                                    local snow4 = target.CFrame * CFrame.new(0, 2, 2)
+                                    local snow5 = game:GetService("Players")
+                                    local snow6 = snow5.LocalPlayer.Character.HumanoidRootPart
+                                    snow6.CFrame = snow4
+                                    wait(0.5)
+                                    fireproximityprompt(obj)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "自动购买撬锁",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local lock = true
+        while lock and wait() do
+            local Players = game:GetService("Players")
+            local localPlayer = Players.LocalPlayer
+            if localPlayer.Character then
+                local rootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    Signal.InvokeServer("attemptPurchase", "Lockpick")
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "绕过表情动作系统",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Emotes.Frame.ScrollingFrame:GetDescendants()) do
+            if v.Name == "Locked" then
+                v.Visible = false
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "绕过移动经销商系统",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        game:GetService("Players").LocalPlayer:SetAttribute("mobileDealer",true)
+        local ReplicatedStorage=game:GetService("ReplicatedStorage")
+        local mobileDealer=require(ReplicatedStorage.devv.shared.Indicies.mobileDealer)
+        for category,items in pairs(mobileDealer) do 
+            for _,item in ipairs(items) do 
+                item.stock=999999 
+            end 
+        end
+        local ReplicatedStorage=game:GetService("ReplicatedStorage")
+        local mobileDealer=require(ReplicatedStorage.devv.shared.Indicies.mobileDealer)
+        table.insert(mobileDealer.Gun,{itemName="Acid Gun",stock=999999})
+        table.insert(mobileDealer.Gun,{itemName="Candy Bucket",stock=999999})
+    end
+})
+
+local Button = Tab:Button({
+    Title = "绕过战斗状态系统",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        for _, func in pairs(getgc(true)) do
+            if type(func) == "function" then
+                local info = debug.getinfo(func)
+                if info.name == "isInCombat" or (info.source and info.source:find("combatIndicator")) then
+                    hookfunction(func, function() 
+                        return false 
+                    end)
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "普通气球美化美金气球",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        for _, v in pairs(getgc(true)) do
+            if type(v) == "table" and rawget(v, "name") == "Balloon" and rawget(v, "holdableType") == "Balloon" then
+                v.name, v.cost, v.unpurchasable, v.multiplier, v.movespeedAdd, v.cannotDiscard = "Dollar Balloon", 200, true, 0.8, 8, true
+                if v.TPSOffsets then v.TPSOffsets.hold = CFrame.new(0, 0, 0) * CFrame.Angles(0, math.pi, 0) end
+                if v.viewportOffsets and v.viewportOffsets.hotbar then v.viewportOffsets.hotbar.dist = 4 end
+                v.canDrop, v.dropCooldown, v.craft = nil
+                break
+            end
+        end
+
+        for _, item in pairs(require(game.ReplicatedStorage.devv.client.Objects.v3item.modules.inventory).items) do
+            if item.name == "Dollar Balloon" then
+                for _, btn in pairs({item.button, item.backpackButton}) do
+                    if btn and btn.resetModelSkin then btn:resetModelSkin() end
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "普通气球美化黑玫瑰气球",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        for _, v in pairs(getgc(true)) do
+            if type(v) == "table" and rawget(v, "name") == "Balloon" and rawget(v, "holdableType") == "Balloon" then
+                v.name, v.cost, v.unpurchasable, v.multiplier, v.movespeedAdd, v.cannotDiscard = "Black Rose", 200, true, 0.75, 12, true
+                if v.TPSOffsets then v.TPSOffsets.hold = CFrame.new(0, 0.5, 0) end
+                if v.viewportOffsets and v.viewportOffsets.hotbar then v.viewportOffsets.hotbar.dist = 3 end
+                v.canDrop, v.dropCooldown, v.craft = nil
+                break
+            end
+        end
+
+        for _, item in pairs(require(game.ReplicatedStorage.devv.client.Objects.v3item.modules.inventory).items) do
+            if item.name == "Black Rose" then
+                for _, btn in pairs({item.button, item.backpackButton}) do
+                    if btn and btn.resetModelSkin then btn:resetModelSkin() end
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "美化钱包",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        for _, v in pairs(getgc(true)) do
+            if type(v) == "table" and rawget(v, "name") == "Wallet" then
+                v.name = "Duffel Bag"
+                v.modelName = "Duffel Bag"
+                v.subtype = "Wallet"
+                if v.TPSOffsets then
+                    v.TPSOffsets.hold = CFrame.new(-0.1, -1, 0.1)
+                end
+                if v.viewportOffsets and v.viewportOffsets.hotbar then
+                    v.viewportOffsets.hotbar.offset = CFrame.new(0.1, 0.2, -2.5)
+                    v.viewportOffsets.hotbar.rotoffset = CFrame.Angles(0.7853981633974483, 2.6179938779914944, 0)
+                end
+                break
+            end
+        end
+
+        local inventory = require(game.ReplicatedStorage.devv.client.Objects.v3item.modules.inventory)
+        for _, item in pairs(inventory.items) do
+            if item.name == "Duffel Bag" then
+                if item.button and item.button.resetModelSkin then
+                    item.button:resetModelSkin()
+                end
+                if item.backpackButton and item.backpackButton.resetModelSkin then
+                    item.backpackButton:resetModelSkin()
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "即时互动",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        workspace.DescendantAdded:Connect(function(obj)
+            if obj:IsA("ProximityPrompt") then
+                obj.HoldDuration = 0
+            end
+        end)
+
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") then
+                obj.HoldDuration = 0
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "防虚空",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local RunService = game:GetService("RunService")
+        local Players = game:GetService("Players")
+        local speaker = Players.LocalPlayer
+        local antivoidloop
+
+        local function getRoot(character)
+            return character and character:FindFirstChild("HumanoidRootPart") or character:FindFirstChildWhichIsA("BasePart")
+        end
+
+        local state = true
+        if state then
+            local OrgDestroyHeight = workspace.FallenPartsDestroyHeight
+            antivoidloop = RunService.Stepped:Connect(function()
+                local character = speaker.Character
+                if character then
+                    local root = getRoot(character)
+                    if root and root.Position.Y <= OrgDestroyHeight + 25 then
+                        root.Velocity = root.Velocity + Vector3.new(0, 250, 0)
+                    end
+                end
+            end)
+        else
+            if antivoidloop then
+                antivoidloop:Disconnect()
+                antivoidloop = nil
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "飞行V3",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local main = Instance.new("ScreenGui")
+        local Frame = Instance.new("Frame")
+        local up = Instance.new("TextButton")
+        local down = Instance.new("TextButton")
+        local onof = Instance.new("TextButton")
+        local TextLabel = Instance.new("TextLabel")
+        local plus = Instance.new("TextButton")
+        local speed = Instance.new("TextLabel")
+        local mine = Instance.new("TextButton")
+        local closebutton = Instance.new("TextButton")
+        local mini = Instance.new("TextButton")
+        local mini2 = Instance.new("TextButton")
+
+        main.Name = "main"
+        main.Parent = game:GetService"Players".LocalPlayer:WaitForChild("PlayerGui")
+        main.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        main.ResetOnSpawn = false
+
+        Frame.Parent = main
+        Frame.BackgroundColor3 = Color3.fromRGB(163, 255, 137)
+        Frame.BorderColor3 = Color3.fromRGB(103, 221, 213)
+        Frame.Position = UDim2.new(0.100320168, 0, 0.379746825, 0)
+        Frame.Size = UDim2.new(0, 190, 0, 57)
+
+        up.Name = "up"
+        up.Parent = Frame
+        up.BackgroundColor3 = Color3.fromRGB(79, 255, 152)
+        up.Size = UDim2.new(0, 44, 0, 28)
+        up.Font = Enum.Font.SourceSans
+        up.Text = "上"
+        up.TextColor3 = Color3.fromRGB(0, 0, 0)
+        up.TextSize = 14.000
+
+        down.Name = "down"
+        down.Parent = Frame
+        down.BackgroundColor3 = Color3.fromRGB(215, 255, 121)
+        down.Position = UDim2.new(0, 0, 0.491228074, 0)
+        down.Size = UDim2.new(0, 44, 0, 28)
+        down.Font = Enum.Font.SourceSans
+        down.Text = "下"
+        down.TextColor3 = Color3.fromRGB(0, 0, 0)
+        down.TextSize = 14.000
+
+        onof.Name = "onof"
+        onof.Parent = Frame
+        onof.BackgroundColor3 = Color3.fromRGB(255, 249, 74)
+        onof.Position = UDim2.new(0.702823281, 0, 0.491228074, 0)
+        onof.Size = UDim2.new(0, 56, 0, 28)
+        onof.Font = Enum.Font.SourceSans
+        onof.Text = "飞行"
+        onof.TextColor3 = Color3.fromRGB(0, 0, 0)
+        onof.TextSize = 14.000
+
+        TextLabel.Parent = Frame
+        TextLabel.BackgroundColor3 = Color3.fromRGB(242, 60, 255)
+        TextLabel.Position = UDim2.new(0.469327301, 0, 0, 0)
+        TextLabel.Size = UDim2.new(0, 100, 0, 28)
+        TextLabel.Font = Enum.Font.SourceSans
+        TextLabel.Text = "飞行V3"
+        TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+        TextLabel.TextScaled = true
+        TextLabel.TextSize = 14.000
+        TextLabel.TextWrapped = true
+
+        plus.Name = "plus"
+        plus.Parent = Frame
+        plus.BackgroundColor3 = Color3.fromRGB(133, 145, 255)
+        plus.Position = UDim2.new(0.231578946, 0, 0, 0)
+        plus.Size = UDim2.new(0, 45, 0, 28)
+        plus.Font = Enum.Font.SourceSans
+        plus.Text = "+"
+        plus.TextColor3 = Color3.fromRGB(0, 0, 0)
+        plus.TextScaled = true
+        plus.TextSize = 14.000
+        plus.TextWrapped = true
+
+        speed.Name = "speed"
+        speed.Parent = Frame
+        speed.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
+        speed.Position = UDim2.new(0.468421042, 0, 0.491228074, 0)
+        speed.Size = UDim2.new(0, 44, 0, 28)
+        speed.Font = Enum.Font.SourceSans
+        speed.Text = "1"
+        speed.TextColor3 = Color3.fromRGB(0, 0, 0)
+        speed.TextScaled = true
+        speed.TextSize = 14.000
+        speed.TextWrapped = true
+
+        mine.Name = "mine"
+        mine.Parent = Frame
+        mine.BackgroundColor3 = Color3.fromRGB(123, 255, 247)
+        mine.Position = UDim2.new(0.231578946, 0, 0.491228074, 0)
+        mine.Size = UDim2.new(0, 45, 0, 29)
+        mine.Font = Enum.Font.SourceSans
+        mine.Text = "-"
+        mine.TextColor3 = Color3.fromRGB(0, 0, 0)
+        mine.TextScaled = true
+        mine.TextSize = 14.000
+        mine.TextWrapped = true
+
+        closebutton.Name = "Close"
+        closebutton.Parent = main.Frame
+        closebutton.BackgroundColor3 = Color3.fromRGB(225, 25, 0)
+        closebutton.Font = "SourceSans"
+        closebutton.Size = UDim2.new(0, 45, 0, 28)
+        closebutton.Text = "关闭"
+        closebutton.TextSize = 30
+        closebutton.Position =  UDim2.new(0, 0, -1, 27)
+
+        mini.Name = "minimize"
+        mini.Parent = main.Frame
+        mini.BackgroundColor3 = Color3.fromRGB(192, 150, 230)
+        mini.Font = "SourceSans"
+        mini.Size = UDim2.new(0, 45, 0, 28)
+        mini.Text = "隐藏"
+        mini.TextSize = 40
+        mini.Position = UDim2.new(0, 44, -1, 27)
+
+        mini2.Name = "minimize2"
+        mini2.Parent = main.Frame
+        mini2.BackgroundColor3 = Color3.fromRGB(192, 150, 230)
+        mini2.Font = "SourceSans"
+        mini2.Size = UDim2.new(0, 45, 0, 28)
+        mini2.Text = "+"
+        mini2.TextSize = 40
+        mini2.Position = UDim2.new(0, 44, -1, 57)
+        mini2.Visible = false
+
+        speeds = 1
+
+        local speaker = game:GetService("Players").LocalPlayer
+
+        local chr = game:GetService"Players".LocalPlayer.Character
+        local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+
+        nowe = false
+        Frame.Active = true
+        Frame.Draggable = true
+
+        onof.MouseButton1Down:connect(function()
+            if nowe == true then
+                nowe = false
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,true)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false)
+                speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+            else 
+                nowe = true
+                for i = 1, speeds do
+                    spawn(function()
+                        local hb = game:GetService("RunService").Heartbeat
+                        tpwalking = true
+                        local chr = game:GetService"Players".LocalPlayer.Character
+                        local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                        while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+                            if hum.MoveDirection.Magnitude > 0 then
+                                chr:TranslateBy(hum.MoveDirection)
+                            end
+                        end
+                    end)
+                end
+                game:GetService"Players".LocalPlayer.Character.Animate.Disabled = true
+                local Char = game:GetService"Players".LocalPlayer.Character
+                local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
+                for i,v in next, Hum:GetPlayingAnimationTracks() do
+                    v:AdjustSpeed(0)
+                end
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,false)
+                speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false)
+                speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
+            end
+
+            if game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6 then
+                local plr = game:GetService"Players".LocalPlayer
+                local torso = plr.Character.Torso
+                local flying = true
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = 50
+                local speed = 0
+
+                local bg = Instance.new("BodyGyro", torso)
+                bg.P = 9e4
+                bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+                bg.cframe = torso.CFrame
+                local bv = Instance.new("BodyVelocity", torso)
+                bv.velocity = Vector3.new(0,0.1,0)
+                bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+                if nowe == true then
+                    plr.Character.Humanoid.PlatformStand = true
+                end
+                while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
+                    game:GetService("RunService").RenderStepped:Wait()
+                    if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                        speed = speed+.5+(speed/maxspeed)
+                        if speed > maxspeed then
+                            speed = maxspeed
+                        end
+                    elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                        speed = speed-1
+                        if speed < 0 then
+                            speed = 0
+                        end
+                    end
+                    if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                        bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+                        lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                    elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                        bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+                    else
+                        bv.velocity = Vector3.new(0,0,0)
+                    end
+                    bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+                end
+                ctrl = {f = 0, b = 0, l = 0, r = 0}
+                lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                speed = 0
+                bg:Destroy()
+                bv:Destroy()
+                plr.Character.Humanoid.PlatformStand = false
+                game:GetService"Players".LocalPlayer.Character.Animate.Disabled = false
+                tpwalking = false
+            else
+                local plr = game:GetService"Players".LocalPlayer
+                local UpperTorso = plr.Character.UpperTorso
+                local flying = true
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = 50
+                local speed = 0
+
+                local bg = Instance.new("BodyGyro", UpperTorso)
+                bg.P = 9e4
+                bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+                bg.cframe = UpperTorso.CFrame
+                local bv = Instance.new("BodyVelocity", UpperTorso)
+                bv.velocity = Vector3.new(0,0.1,0)
+                bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+                if nowe == true then
+                    plr.Character.Humanoid.PlatformStand = true
+                end
+                while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
+                    wait()
+                    if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                        speed = speed+.5+(speed/maxspeed)
+                        if speed > maxspeed then
+                            speed = maxspeed
+                        end
+                    elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                        speed = speed-1
+                        if speed < 0 then
+                            speed = 0
+                        end
+                    end
+                    if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                        bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+                        lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                    elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                        bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+                    else
+                        bv.velocity = Vector3.new(0,0,0)
+                    end
+                    bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+                end
+                ctrl = {f = 0, b = 0, l = 0, r = 0}
+                lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                speed = 0
+                bg:Destroy()
+                bv:Destroy()
+                plr.Character.Humanoid.PlatformStand = false
+                game:GetService"Players".LocalPlayer.Character.Animate.Disabled = false
+                tpwalking = false
+            end
+        end)
+
+        local tis
+        up.MouseButton1Down:connect(function()
+            tis = up.MouseEnter:connect(function()
+                while tis do
+                    wait()
+                    game:GetService"Players".LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService"Players".LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,1,0)
+                end
+            end)
+        end)
+
+        up.MouseLeave:connect(function()
+            if tis then
+                tis:Disconnect()
+                tis = nil
+            end
+        end)
+
+        local dis
+        down.MouseButton1Down:connect(function()
+            dis = down.MouseEnter:connect(function()
+                while dis do
+                    wait()
+                    game:GetService"Players".LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService"Players".LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,-1,0)
+                end
+            end)
+        end)
+
+        down.MouseLeave:connect(function()
+            if dis then
+                dis:Disconnect()
+                dis = nil
+            end
+        end)
+
+        game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
+            wait(0.7)
+            game:GetService"Players".LocalPlayer.Character.Humanoid.PlatformStand = false
+            game:GetService"Players".LocalPlayer.Character.Animate.Disabled = false
+        end)
+
+        plus.MouseButton1Down:connect(function()
+            speeds = speeds + 1
+            speed.Text = speeds
+            if nowe == true then
+                tpwalking = false
+                for i = 1, speeds do
+                    spawn(function()
+                        local hb = game:GetService("RunService").Heartbeat
+                        tpwalking = true
+                        local chr = game:GetService"Players".LocalPlayer.Character
+                        local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                        while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+                            if hum.MoveDirection.Magnitude > 0 then
+                                chr:TranslateBy(hum.MoveDirection)
+                            end
+                        end
+                    end)
+                end
+            end
+        end)
+        
+        mine.MouseButton1Down:connect(function()
+            if speeds == 1 then
+                speed.Text = 'cannot be less than 1'
+                wait(1)
+                speed.Text = speeds
+            else
+                speeds = speeds - 1
+                speed.Text = speeds
+                if nowe == true then
+                    tpwalking = false
+                    for i = 1, speeds do
+                        spawn(function()
+                            local hb = game:GetService("RunService").Heartbeat
+                            tpwalking = true
+                            local chr = game:GetService"Players".LocalPlayer.Character
+                            local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                            while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+                                if hum.MoveDirection.Magnitude > 0 then
+                                    chr:TranslateBy(hum.MoveDirection)
+                                end
+                            end
+                        end)
+                    end
+                end
+            end
+        end)
+
+        closebutton.MouseButton1Click:Connect(function()
+            main:Destroy()
+        end)
+
+        mini.MouseButton1Click:Connect(function()
+            up.Visible = false
+            down.Visible = false
+            onof.Visible = false
+            plus.Visible = false
+            speed.Visible = false
+            mine.Visible = false
+            mini.Visible = false
+            mini2.Visible = true
+            main.Frame.BackgroundTransparency = 1
+            closebutton.Position =  UDim2.new(0, 0, -1, 57)
+        end)
+
+        mini2.MouseButton1Click:Connect(function()
+            up.Visible = true
+            down.Visible = true
+            onof.Visible = true
+            plus.Visible = true
+            speed.Visible = true
+            mine.Visible = true
+            mini.Visible = true
+            mini2.Visible = false
+            main.Frame.BackgroundTransparency = 0 
+            closebutton.Position =  UDim2.new(0, 0, -1, 27)
+        end)
+    end
+})
+
+local Button = Tab:Button({
+    Title = "设置辅助瞄准数值",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local value = 1
+        game:GetService("Players").LocalPlayer:SetAttribute("aimAssistSensitivity", value)
+    end
+})
+
+local Dropdown = Tab:Dropdown({
+    Title = "选择皮肤并应用",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local Value = "烟火"
+        local skinsec = ""
+        
+        if Value == "烟火" then
+            skinsec = "Sparkler"
+        elseif Value == "虚空" then
+            skinsec = "Void"
+        elseif Value == "纯金" then
+            skinsec = "Solid Gold"
+        elseif Value == "暗物质" then
+            skinsec = "Dark Matter"
+        elseif Value == "反物质" then
+            skinsec = "Anti Matter"
+        elseif Value == "神秘" then
+            skinsec = "Hystic"
+        elseif Value == "虚空神秘" then
+            skinsec = "Void Mystic"
+        elseif Value == "战术" then
+            skinsec = "Tactical"
+        elseif Value == "纯金战术" then
+            skinsec = "Solid Gold Tactical"
+        elseif Value == "白未来" then
+            skinsec = "Future White"
+        elseif Value == "黑未来" then
+            skinsec = "Future Black"
+        elseif Value == "圣诞未来" then
+            skinsec = "Christmas Future"
+        elseif Value == "礼物包装" then
+            skinsec = "Gift Wrapped"
+        elseif Value == "猩红" then
+            skinsec = "Crimson Blood"
+        elseif Value == "收割者" then
+            skinsec = "Reaper"
+        elseif Value == "虚空收割者" then
+            skinsec = "Void Reaper"
+        elseif Value == "圣诞玩具" then
+            skinsec = "Christmas Toy"
+        elseif Value == "荒地" then
+            skinsec = "Wasteland"
+        elseif Value == "隐形" then
+            skinsec = "Invisible"
+        elseif Value == "像素" then
+            skinsec = "Pixel"
+        elseif Value == "钻石像素" then
+            skinsec = "Diamond Pixel"
+        elseif Value == "黄金零下" then
+            skinsec = "Frozen-Gold"
+        elseif Value == "绿水晶" then
+            skinsec = "Atomic Nature"
+        elseif Value == "生物" then
+            skinsec = "Biohazard"
+        elseif Value == "樱花" then
+            skinsec = "Sakura"
+        elseif Value == "精英" then
+            skinsec = "Elite"
+        elseif Value == "黑樱花" then
+            skinsec = "Death Blossom-Gold"
+        elseif Value == "彩虹激光" then
+            skinsec = "Rainbowlaser"
+        elseif Value == "蓝水晶" then
+            skinsec = "Atomic Water"
+        elseif Value == "紫水晶" then
+            skinsec = "Atomic Amethyst"
+        elseif Value == "红水晶" then
+            skinsec = "Atomic Flame"
+        elseif Value == "零下" then
+            skinsec = "Sub-Zero"
+        elseif Value == "虚空射线" then
+            skinsec = "Void-Ray"
+        elseif Value == "冰冻钻石" then
+            skinsec = "Frozen Diamond"
+        elseif Value == "虚空梦魇" then
+            skinsec = "Void Nightmare"
+        elseif Value == "金雪" then
+            skinsec = "Golden Snow"
+        elseif Value == "爱国者" then
+            skinsec = "Patriot"
+        elseif Value == "MM2" then
+            skinsec = "MM2 Barrett"
+        elseif Value == "声望" then
+            skinsec = "Prestige Barnett"
+        elseif Value == "酷化" then
+            skinsec = "Skin Walter"
+        elseif Value == "蒸汽" then
+            skinsec = "Steampunk"
+        elseif Value == "海盗" then
+            skinsec = "Pirate"
+        elseif Value == "玫瑰" then
+            skinsec = "Rose"
+        elseif Value == "黑玫瑰" then
+            skinsec = "Black Rose"
+        elseif Value == "激光" then
+            skinsec = "Hyperlaser"
+        elseif Value == "烟花" then
+            skinsec = "Firework"
+        elseif Value == "诅咒背瓜" then
+            skinsec = "Cursed Pumpkin"
+        elseif Value == "大炮" then
+            skinsec = "Cannon"
+        elseif Value == "财富" then
+            skinsec = "Firework"
+        elseif Value == "黄金大炮" then
+            skinsec = "Gold Cannon"
+        elseif Value == "四叶草" then
+            skinsec = "Lucky Clover"
+        elseif Value == "自由" then
+            skinsec = "Freedom"
+        elseif Value == "黑曜石" then
+            skinsec = "Obsidian"
+        elseif Value == "赛博朋克" then
+            skinsec = "Cyberpunk"
+        end
+        
+        local autoskin = true
+        if autoskin then
+            local it = require(game:GetService("ReplicatedStorage").devv).load("v3item").inventory
+            local b1 = require(game:GetService('ReplicatedStorage').devv).load('v3item').inventory.items
+            for i, item in next, b1 do 
+                if item.type == "Gun" then
+                    it.skinUpdate(item.name, skinsec)
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "开启全枪虚空美化",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local skinvoid = true
+        if skinvoid then
+            local it = require(game:GetService("ReplicatedStorage").devv).load("v3item").inventory
+            local b1 = require(game:GetService('ReplicatedStorage').devv).load('v3item').inventory.items
+            for i, item in next, b1 do 
+                if item.type == "Gun" then
+                    table.insert(require(game:GetService("ReplicatedStorage").devv.shared.Indicies.skins.bin.Special.Void).compatabilities, item.name)
+                    it.skinUpdate(item.name, "Void")
+                end
+            end
+        end
+    end
+})
+
+local Button = Tab:Button({
+    Title = "破解所有物品格",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        game:GetService("Players").LocalPlayer:SetAttribute("lockerSlots", 999)
+        
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local devv = require(ReplicatedStorage.devv)
+        local lockerModule = devv.load("locker")
+        local purchases = devv.load("purchases")
+        local globals = devv.load("globals")
+        
+        local originalGetNextTier = lockerModule.getNextTier
+        local originalGetRobuxPrice = lockerModule.getRobuxPrice
+        
+        lockerModule.getNextTier = function()
+            return 5  
+        end
+        
+        lockerModule.getRobuxPrice = function(slots)
+            return 0 
+        end
+        
+        local GUILoader = devv.load("GUILoader")
+        local backpackUI = GUILoader.Get("Backpack")
+        
+        for _, slot in pairs(backpackUI.Holder.Locker.Frame:GetChildren()) do
+            if slot:IsA("GuiObject") then
+                slot.Locked.Visible = false
+                slot.Unlocked.Visible = true
+            end
+        end
+        
+        backpackUI.Holder.Locker.Buttons.UnlockAll.Visible = false
+        backpackUI.Holder.Locker.Buttons.PageSelector.Visible = false
+        
+        if lockerModule.PromptPurchase then
+            local originalPromptPurchase = lockerModule.PromptPurchase
+            lockerModule.PromptPurchase = function(itemId, infoType)
+                game:GetService("ReplicatedStorage").Signal:InvokeServer("completePurchase", itemId, infoType)
+            end
+        end
+        
+        lockerModule.update()
+        
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "破解成功",
+            Text = "",
+            Duration = 5
+        })
+    end
+})
+
+local Button = Tab:Button({
+    Title = "获取管理员核弹发射器",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        
+        pcall(function()
+            local itemSystem = require(ReplicatedStorage.devv).load("v3item")
+            local inventory = itemSystem.inventory
+            
+            local fistsItem = nil
+            for guid, item in pairs(inventory.items) do
+                if item.name == "Fists" then
+                    fistsItem = item
+                    break
+                end
+            end
+            
+            local nukeLauncherData = {
+                name = "Admin Nuke Launcher",
+                guid = "admin_nuke_launcher_"..tostring(tick()),
+                modelName = "Nuke Launcher",
+                subtype = "Nuke Launcher",
+                adminOnly = true,
+                canDrop = false,
+                unpurchasable = true,
+                ammo = 99999999,
+                startAmmo = -1,
+                maxAmmo = -1,
+                overrideProjectileProperties = {disableNukeFlash = true},
+                reloadTime = 0,
+                reloadType = "mag",
+                firemode = "auto",
+                numProjectiles = 1,
+                fireDebounce = 0.2,
+                viewportOffsets = fistsItem and fistsItem.viewportOffsets or {
+                    hotbar = {dist = 2.75, offset = CFrame.new(0.25, 0, 0), rotoffset = CFrame.Angles(-0.7853981633974483, -0.7853981633974483, 0.7853981633974483)},
+                    ammoHUD = {dist = 2, offset = CFrame.new(0, 0, 0), rotoffset = CFrame.Angles(-1.3744467859455345, 0, 3.3379421944391554)}
+                },
+                TPSOffsets = fistsItem and fistsItem.TPSOffsets or {},
+                FPSOffsets = fistsItem and fistsItem.FPSOffsets or {}
+            }
+            
+            if inventory.add then
+                inventory.add(nukeLauncherData, false)
+                if inventory.currentItemsData then
+                    table.insert(inventory.currentItemsData, nukeLauncherData)
+                end
+            end
+            
+            if fistsItem then
+                local fistsCopy = {
+                    name = "Fists",
+                    guid = "fists_copy_"..tostring(tick()),
+                    permanent = true,
+                    cannotDiscard = true,
+                    doMakeModel = false,
+                    debounce = 0.3,
+                    damageTable = {meleepunch = 15, meleemegapunch = 200, meleekick = 20, meleejumpKick = 20},
+                    viewportOffsets = fistsItem.viewportOffsets,
+                    TPSOffsets = fistsItem.TPSOffsets or {},
+                    FPSOffsets = fistsItem.FPSOffsets or {}
+                }
+                if inventory.add then
+                    inventory.add(fistsCopy, false)
+                end
+            end
+            
+            if inventory.rerender then
+                inventory:rerender()
+            end
+        end)
+    end
+})
+
+local Button = Tab:Button({
+    Title = "获取管理员RPG",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        
+        pcall(function()
+            local itemSystem = require(ReplicatedStorage.devv).load("v3item")
+            local inventory = itemSystem.inventory
+            
+            local rpgData = {
+                name = "Admin RPG",
+                guid = "admin_rpg_"..tostring(tick()),
+                modelName = "RPG",
+                subtype = "RPG",
+                adminOnly = true,
+                canDrop = false,
+                unpurchasable = true,
+                ammo = 99999999,
+                startAmmo = -1,
+                maxAmmo = -1,
+                reloadTime = 0,
+                reloadType = "mag",
+                firemode = "auto",
+                numProjectiles = 1,
+                fireDebounce = 0.02,
+                recoilAdd = 0,
+                maxRecoil = 0,
+                recoilDiminishFactor = 0,
+                recoilFastDiminishFactor = 0
+            }
+            
+            if inventory.add then
+                inventory.add(rpgData, false)
+                if inventory.currentItemsData then
+                    table.insert(inventory.currentItemsData, rpgData)
+                end
+            end
+            
+            if inventory.rerender then
+                inventory:rerender()
+            end
+        end)
+    end
+})
+
+local Button = Tab:Button({
+    Title = "获取管理员AK-47",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        
+        pcall(function()
+            local itemSystem = require(ReplicatedStorage.devv).load("v3item")
+            local inventory = itemSystem.inventory
+            
+            local ak47Data = {
+                name = "Admin AK-47",
+                guid = "admin_ak47_"..tostring(tick()),
+                modelName = "Gold AK-47",
+                subtype = "AK-47",
+                adminOnly = true,
+                canDrop = false,
+                unpurchasable = true,
+                damage = 10,
+                ammo = 999999999,
+                startAmmo = -1,
+                maxAmmo = -1,
+                firemode = "auto",
+                numProjectiles = 8,
+                fireDebounce = 0.01
+            }
+            
+            if inventory.add then
+                inventory.add(ak47Data, false)
+                if inventory.currentItemsData then
+                    table.insert(inventory.currentItemsData, ak47Data)
+                end
+            end
+            
+            if inventory.rerender then
+                inventory:rerender()
+            end
+        end)
+    end
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "布鲁克黑文角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "瓦卡斯特角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "科西嘉角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "法国救援角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "光环角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "安纳西角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "法国紧急救援角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "校园生活角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "星球大战角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "通用角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "英国陆军学院",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "来世紧急救援",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "SCP基金会角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "瓦朗谢讷角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "警察角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "消防员角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "医生角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "军人角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "黑帮角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "吸血鬼角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "狼人角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "超级英雄角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "魔法世界角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "未来世界角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "古代中国角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "日本武士角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海盗角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "西部牛仔角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "太空探险角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海底世界角色扮演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "愤怒至尊",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海贼王果实",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "床战",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "最强战场",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫先锋",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫皇家",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫重生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫次元",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫最终防线",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫守护者",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "进击的巨人革命",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "鬼灭之刃战斗",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动漫终极对决",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "1v1射击",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "拳击模拟",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "死神战斗",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海贼王战场",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "黑子的篮球",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "蓝色监狱足球",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "肌肉传奇",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "战争模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "坦克大战",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "飞机空战",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海战模拟",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "忍者战斗",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "武士对决",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "魔法战斗",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "机甲对战",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "怪兽大战",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "领养我",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "喵喵镇",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "种植花园",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "餐厅大亨2",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "主题公园大亨2",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "披萨店工作",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "格林维尔",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "车辆传奇",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "驾驶帝国",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "紧急响应自由县",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "自然灾害生存",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "动物模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "农场模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "城市建设",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "房屋设计",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "时尚设计师",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "音乐制作人",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "电影导演",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "作家模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "画家模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "厨师模拟器",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "咖啡店老板",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "酒吧老板",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "酒店经理",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "超市经理",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "医院院长",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "学校校长",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "警察局长",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "消防队长",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "军队指挥官",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "小猪恐怖",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "门后恐怖",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "惊悚恐怖",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖主题",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "被遗弃",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "未知之门",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "北方不死",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "森林99夜",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "僵尸狩猎",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "模仿者第四章",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖医院",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖学校",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖旅馆",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖森林",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖墓地",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖实验室",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖监狱",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖城堡",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖太空站",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恐怖海底基地",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "幽灵船",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "鬼屋探险",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "诅咒之地",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "恶魔召唤",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "吸血鬼城堡",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "狼人森林",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "僵尸末日",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "病毒爆发",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "异形入侵",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "怪物猎人",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "神秘悬疑",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "冒险探索",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "宝藏猎人",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "古墓丽影",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "丛林探险",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "雪山攀登",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "深海潜水",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "太空漫游",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "时间旅行",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "平行世界",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "秘境寻宝",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "遗迹探索",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "洞穴探险",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "荒岛求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "沙漠求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "极地求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "丛林求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "雪山求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "海底求生",
+    Icon = "settings",
+    Locked = false,
+})
+
+local Tab = Tabs.Main:Tab({
+    Title = "太空求生",
+    Icon = "settings",
+    Locked = false,
+})
