@@ -130,7 +130,7 @@ game.HttpGetAsync and game:HttpGetAsync(i) or h:GetAsync(i))()
 				Orange = "#f57c00",
 				Green = "#43a047",
 				Blue = "#039be5",
-				White = "#00FF7F",
+				White = "#FFFFE0",
 				Grey = "#484848",
 			},
 			ThemeFallbacks = a.load'a',
@@ -1845,9 +1845,9 @@ game.HttpGetAsync and game:HttpGetAsync(ad) or HttpService:GetAsync(ad))()
 					ac("UIGradient", {
 						Rotation = 70,
 						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 						},
 						Transparency = NumberSequence.new{
 							NumberSequenceKeypoint.new(0.0, 0.1),
@@ -2709,7 +2709,7 @@ g.Icon or h.Icon or Icons[g.Type] or "user", g.Icon or h.Icon or Icons[g.Type] o
 			ae.Frame = ac("Frame", {
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
-				BackgroundColor3 = Color3.fromRGB(0,255,127),
+				BackgroundColor3 = Color3.fromRGB(255, 255, 0),
 				BorderSizePixel = 0,
 			}, {
 				ac("UICorner", {
@@ -2728,7 +2728,7 @@ g.Icon or h.Icon or Icons[g.Type] or "user", g.Icon or h.Icon or Icons[g.Type] o
 					}),
 				}),
 				ac("Frame", {
-					BackgroundColor3 = Color3.fromRGB(0,255,127),
+					BackgroundColor3 = Color3.fromRGB(255, 255, 0),
 					BackgroundTransparency = 1,
 					Size = UDim2.fromScale(1, 1),
 				}, {
@@ -3006,8 +3006,8 @@ af.Icon, af.Title .. ":" .. af.Icon, 0, ae.WindUI.Window, "Popup", true, ae.Icon
 					Name = "Dark",
 					Accent = Color3.fromHex"#18181b",
 					Dialog = Color3.fromHex"#161616",
-					Outline = Color3.fromHex"#00FF7F",
-					Text = Color3.fromHex"#00FF7F",
+					Outline = Color3.fromHex"#FFFFE0",
+					Text = Color3.fromHex"#FFFFE0",
 					Placeholder = Color3.fromHex"#7a7a7a",
 					Background = Color3.fromHex"#101010",
 					Button = Color3.fromHex"#52525b",
@@ -3015,7 +3015,7 @@ af.Icon, af.Title .. ":" .. af.Icon, 0, ae.WindUI.Window, "Popup", true, ae.Icon
 				},
 				Light = {
 					Name = "Light",
-					Accent = Color3.fromHex"#00FF7F",
+					Accent = Color3.fromHex"#FFFFE0",
 					Dialog = Color3.fromHex"#f4f4f5",
 					Outline = Color3.fromHex"#09090b",
 					Text = Color3.fromHex"#000000",
@@ -3202,8 +3202,8 @@ af.Icon, af.Title .. ":" .. af.Icon, 0, ae.WindUI.Window, "Popup", true, ae.Icon
 					}, {
 						Rotation = 135,
 					}),
-					Outline = Color3.fromHex"#00FF7F",
-					Text = Color3.fromHex"#00FF7F",
+					Outline = Color3.fromHex"#FFFFE0",
+					Text = Color3.fromHex"#FFFFE0",
 					Placeholder = Color3.fromHex"#00ff80",
 					Background = aa:Gradient({
 						["0"] = {
@@ -3257,7 +3257,7 @@ af.Icon, af.Title .. ":" .. af.Icon, 0, ae.WindUI.Window, "Popup", true, ae.Icon
 					}, {
 						Rotation = 60,
 					}),
-					Icon = Color3.fromHex"#00FF7F",
+					Icon = Color3.fromHex"#FFFFE0",
 				},
 			}
 		end
@@ -3320,9 +3320,9 @@ af.Icon, af.Title .. ":" .. af.Icon, 0, ae.WindUI.Window, "Popup", true, ae.Icon
 						ac("UIGradient", {
 							Rotation = 70,
 							Color = ColorSequence.new{
-								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 							},
 							Transparency = NumberSequence.new{
 								NumberSequenceKeypoint.new(0.0, 0.1),
@@ -5846,9 +5846,9 @@ ay.Icon, ay.Icon, 0, al.Window.Folder, "Dropdown", true)
 								aj("UIGradient", {
 									Rotation = 80,
 									Color = ColorSequence.new{
-										ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-										ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-										ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+										ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+										ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+										ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 									},
 									Transparency = NumberSequence.new{
 										NumberSequenceKeypoint.new(0.0, 0.1),
@@ -6517,7 +6517,7 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 				Visible = an and true or false,
 			}, {
 				ae.NewRoundFrame(ap.Radius - 4, "Squircle", {
-					ImageColor3 = Color3.fromHex"#00FF7F",
+					ImageColor3 = Color3.fromHex"#FFFFE0",
 					ImageTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
@@ -6535,7 +6535,7 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						Position = UDim2.new(0.5, 0, 0.5, 0),
 						Size = UDim2.new(0, 12, 0, 12),
-						ImageColor3 = Color3.fromHex"#00FF7F",
+						ImageColor3 = Color3.fromHex"#FFFFE0",
 						ImageTransparency = .1,
 					})
 				})
@@ -6565,7 +6565,7 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 			}, {
 				ae.NewRoundFrame(ap.Radius, "SquircleOutline", {
 					Size = UDim2.new(1, 0, 1, 0),
-					ImageColor3 = Color3.fromHex"#00FF7F",
+					ImageColor3 = Color3.fromHex"#FFFFE0",
 					ImageTransparency = .955,
 				}),
 				ag("Frame", {
@@ -6574,7 +6574,7 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 					AutomaticSize = "Y",
 				}, {
 					ae.NewRoundFrame(ap.Radius, "Squircle-TL-TR", {
-						ImageColor3 = Color3.fromHex"#00FF7F",
+						ImageColor3 = Color3.fromHex"#FFFFE0",
 						ImageTransparency = .96,
 						Size = UDim2.new(1, 0, 0, 20 + (ap.Padding * 2)),
 						Visible = al and true or false
@@ -6583,12 +6583,12 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 							Size = UDim2.new(0, 18, 0, 18),
 							BackgroundTransparency = 1,
 							Image = "rbxassetid://132464694294269",
-							ImageColor3 = Color3.fromHex"#00FF7F",
+							ImageColor3 = Color3.fromHex"#FFFFE0",
 							ImageTransparency = .2,
 						}),
 						ag("TextLabel", {
 							Text = al,
-							TextColor3 = Color3.fromHex"#00FF7F",
+							TextColor3 = Color3.fromHex"#FFFFE0",
 							TextTransparency = .2,
 							TextSize = 16,
 							AutomaticSize = "Y",
@@ -6791,9 +6791,9 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 					ae("UIGradient", {
 						Rotation = 45,
 						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 						},
 						Transparency = NumberSequence.new{
 							NumberSequenceKeypoint.new(0.0, 0.1),
@@ -6849,9 +6849,9 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 					ae("UIGradient", {
 						Rotation = 60,
 						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 						},
 						Transparency = NumberSequence.new{
 							NumberSequenceKeypoint.new(0.0, 0.1),
@@ -6896,9 +6896,9 @@ am.UIElements.Dropdown and am.UIElements.Dropdown:GetPropertyChangedSignal"Absol
 					ae("UIGradient", {
 						Rotation = 60,
 						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 						},
 						Transparency = NumberSequence.new{
 							NumberSequenceKeypoint.new(0.0, 0.1),
@@ -7735,9 +7735,9 @@ ak.Image, ak.Image, ak.Radius, aj.Window.Folder, "Image", false)
 					ag("UIGradient", {
 						Rotation = 80,
 						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+							ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 						},
 						Transparency = NumberSequence.new{
 							NumberSequenceKeypoint.new(0.0, 0.1),
@@ -8972,9 +8972,9 @@ ar.User.Anonymous and 1 or game.Players.LocalPlayer.UserId, Enum.ThumbnailType.H
 						aj("UIGradient", {
 							Rotation = 78,
 							Color = ColorSequence.new{
-								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 							},
 							Transparency = NumberSequence.new{
 								NumberSequenceKeypoint.new(0.0, 0.1),
@@ -9425,9 +9425,9 @@ l, l, 0, ar.Folder, "WindowTopbarIcon", true, r, "WindowTopbarButtonIcon")
 						aj("UIGradient", {
 							Rotation = 45,
 							Color = ColorSequence.new{
-								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,127)),
-								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,255,127)),
+								ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 0)),
+								ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 0)),
 							},
 							Transparency = NumberSequence.new{
 								NumberSequenceKeypoint.new(0.0, 0.1),
@@ -10036,17 +10036,17 @@ A.Icon, B.Title .. ":" .. A.Icon, 0, ar, "Dialog", true, A.IconThemed)
 				if not ar.IgnoreAlerts then
 					ar:SetToTheCenter()
 					ar:Dialog{
-						Title = "尨脚本牛逼",
-						Content = "是否关闭尨脚本",
+						Title = "确定要关闭辰脚本吗🥺🥺",
+						Content = "是否关闭",
 						Buttons = {
 							{
-								Title = "我点错了",
+								Title = "点错了",
 								Callback = function()
 								end,
 								Variant = "Secondary",
 							},
 							{
-								Title = "真的",
+								Title = "是的",
 								Callback = function()
 									ar:Destroy()
 								end,
